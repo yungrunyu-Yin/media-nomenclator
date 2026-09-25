@@ -1,0 +1,64 @@
+# ---- 密钥 / 凭据（绝不入库）----
+# TMDB
+tmdb_api_key
+tmdb_token
+*_api_key
+*_apikey
+*app_secret
+*appsecret
+# CloudDrive2 / 网盘令牌
+cd2_token
+token.txt
+*token*.txt
+.secrets/
+secrets/
+.env
+.env.*
+!.env.example
+
+# ---- 本地规则配置（含个人媒体库路径，不要提交）----
+naming-config.json
+!skills/media-library-auto-rename/naming-config.example.json
+
+# ---- 运行产物：计划 / 快照 / 审计结果 ----
+plans/
+baselines/
+snapshots/
+*.plan.json
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+
+# ---- 测试 / 覆盖率 ----
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 日志 / 缓存 ----
+*.log
+.cache/

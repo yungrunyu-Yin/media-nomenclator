@@ -1,0 +1,347 @@
+{
+  "version": 2,
+  "updatedAt": "2026-09-25",
+  "_notes": "媒体库命名规则配置示例。优先级：用户当次明确指令 > 本文件 > SKILL.md 默认规则。改动本文件即改变所有后续重命名行为，无需改脚本。单一规则集：所有作品、所有目录统一按 defaults 命名，不做按目录的覆盖。语言口径：剧名与集标题一律中文译名优先（须多方查证确认），确认不了才退回官方原名。",
+
+  "defaults": {
+    "_comment_title": "剧名 / 片名规则：先多方查证中文译名，能可靠确认就用中文译名；确认不了才退回官方原名。不分语种、不看存放目录。",
+    "titleRule": "chinese-first",
+    "titleLanguageOrder": ["zh", "official-original-name"],
+    "zhTitleSources": [
+      "tmdb-zh",
+      "official-release-name",
+      "official-platform",
+      "official-subtitle",
+      "douban",
+      "wikipedia-zh",
+      "other"
+    ],
+
+    "metadataPrimary": {
+      "_comment": "整理文件时以该来源的信息为主，其他渠道作为补充。动漫类别计划切换为 dandanplay（API 尚未接入，过渡期仍以 tmdb 为主）。",
+      "default": "tmdb",
+      "categories": {
+        "anime": "dandanplay"
+      },
+      "_comment_categories": "按媒体类别切换**信息来源**；注意这与「按目录覆盖命名格式」是两件事——命名格式规则仍全库统一。",
+      "animeStatus": "pending",
+      "fieldRule": {
+        "_comment": "分段处理：除「中文剧名」外，各字段按主来源单源即可采用。",
+        "year": "primary-single-source-ok",
+        "seasonStructure": "primary-single-source-ok",
+        "seasonName": "primary-single-source-ok",
+        "episodeTitle": "primary-single-source-ok",
+        "zhDramaTitle": "primary + 1 independent source（见 zhTitleAcceptance）"
+      },
+      "conflictPolicy": "主来源与补充来源冲突时，除「中文剧名」外一律以主来源为准；中文剧名冲突则退回官方原名，不猜。"
+    },
+
+    "zhTitleAcceptance": {
+      "appliesTo": ["zh-drama-title"],
+      "authoritativeSingleSourceOK": [
+        "official-release-name",
+        "official-platform",
+        "official-subtitle"
+      ],
+      "otherwiseMinAgreeingSources": 2,
+      "_comment": "「能可靠确认」的标准：官方来源给出中文名即可直接采用；非官方来源（豆瓣 / 维基 / 数据源中文等）需 ≥2 个独立来源一致才采用；只查到 1 处或各来源冲突 → 视为无法确认 → 退回官方原名。",
+      "_comment_scope": "该门槛**只管「中文剧名」一个字段**；年份 / 季结构 / 季名 / 集标题按主来源单源即可采用。",
+      "_comment_sameSourceRule": "同属一个数据源的多种语言变体（如 TMDB 的 zh-CN 与 zh-TW / zh-HK）**不能互相印证**。"
+    },
+
+    "forbidMachineTranslationOfTitle": true,
+    "chineseTitlePreferred": true,
+    "_comment_chineseTitlePreferred": "true = 所有作品（含非华语制作）都优先用中文译名。华语作品的官方中文名即原名，直接采用，绝不为了「统一格式」转成英文。",
+    "chineseProductionNeverTranslatedToEnglish": true,
+    "allowPerTaskLanguageOverride": false,
+    "_comment_allowPerTaskLanguageOverride": "false = 语言口径不接受当次覆盖。任何作品都必须走「中文译名优先」流程。",
+    "fullWidthColonPolicy": "keep",
+    "_comment_fullWidthColonPolicy": "中文标题中的全角冒号「：」是合法文件名，一律保留；仅半角 : 属于非法字符。",
+
+    "year": "entry-first-air-year",
+    "_comment_year": "单季作品 = 该条目首播年。多季 / 续集另按 multiSeason.yearRule（改用该季自己的首播年）。",
+
+    "seasonPrefix": "S",
+    "seasonDigits": 2,
+    "episodePrefix": "E",
+    "episodeDigits": 2,
+    "multiEpisodeFormat": "S01E01-E02",
+    "specialsSeason": "S00",
+
+    "episodeTitle": {
+      "enabled": true,
+      "wrapIn": "「」",
+      "_comment_wrapIn": "集标题一律用全角直角引号包裹，如 `剧名.1998.S01E01.「集标题」.mkv`。引号是标题的一部分，不得省略。",
+      "sourcePriority": [
+        "tmdb",
+        "official-platform-or-subtitle",
+        "douban",
+        "wikipedia",
+        "other"
+      ],
+      "singleSourceOK": true,
+      "_comment_singleSourceOK": "集标题按主来源单源即可采用，但仍必须排除占位编号与站点自拟描述，禁止机翻自编。",
+      "languageRule": "chinese-first",
+      "languageOrder": ["zh", "en", "omit"],
+      "zhTitleSources": [
+        "tmdb-zh",
+        "official-platform-or-subtitle",
+        "douban",
+        "wikipedia-zh",
+        "other"
+      ],
+      "pickRule": "first-source-with-a-real-title",
+      "_comment_pickRule": "按来源顺序取**第一个真正提供集标题的来源**的标题，并在 Dry Run 里注明来源。不做「≥2 来源一致」的硬门槛，但必须排除两类假标题。",
+      "excludePlaceholder": true,
+      "excludeSiteInventedEpisodeLabels": true,
+      "_comment_excludeSiteInventedEpisodeLabels": "① 占位编号（Episode N / 第N集）视为无标题；② 聚合站 / 影评站自拟的分集描述不算集标题，不采信也不算来源冲突。",
+      "omitWhenNoSourceHasTitle": true,
+      "omitWhenMissing": true,
+      "_comment_omitWhenMissing": "确实没有可靠集标题时**省略整段**（不写空「」），文件名形如 `剧名.年份.S01E30.mkv`。",
+      "forbidMachineTranslation": true,
+      "allowInventedTitle": false,
+      "placeholderPatterns": ["^Episode \\d+$", "^第\\d+集$", "^无标题$"]
+    },
+
+    "movie": {
+      "_comment": "电影文件名只保留「片名 + 上映年份 + 分辨率」三项。",
+      "template": "片名 (年份) 分辨率.扩展名",
+      "example": ["示例电影 (2010) 2160p.mkv", "Example Movie (2019) 2160p.mp4"],
+      "yearStyle": "half-width-parens",
+      "_comment_yearStyle": "年份用半角括号包裹，前有空格：` (2010)`",
+      "resolutionStyle": "after-year-space",
+      "_comment_resolutionStyle": "分辨率紧跟年份之后，中间一个空格；分辨率之后即为扩展名，不再有任何字段。",
+      "titleYearSeparator": " ",
+      "_comment_titleYearSeparator": "片名与年份之间用一个空格（不是点号）。",
+      "stripAllOtherInfo": true,
+      "_comment_stripAllOtherInfo": "来源（BluRay / WEB-DL）、编码、位深、音频、声道、发布组等一律删除。",
+      "resolutionFallback": "NEED_REVIEW",
+      "_comment_resolutionFallback": "读不到可靠分辨率（文件名 / 文件夹名都没有）时标 NEED_REVIEW，不猜。",
+      "workFolder": {
+        "pattern": "片名",
+        "includeYear": false,
+        "_comment": "电影的作品目录与其他类型一致，**不带年份**；年份只写在电影文件名里。"
+      }
+    },
+
+    "subtitle": {
+      "_comment": "字幕语言策略。判定顺序见 SKILL §4.4。",
+      "keepSimplifiedOnly": true,
+      "deleteOthersOnlyIfSimplifiedExists": true,
+      "_comment_deleteOthersOnlyIfSimplifiedExists": "★ 铁律：只有当该集确实存在简体字幕时，才允许删掉同集的非简体版本。没有简体替代 → 原样全部保留（否则用户没字幕可看）。",
+      "simplifiedMarkers": ["chs", "sc", "zh-cn", "zh_cn", "simp", "简体", "简中", "简"],
+      "nonSimplifiedMarkers": [
+        "cht", "tc", "zh-tw", "zh_tw", "big5", "繁体", "繁中", "繁",
+        "eng", "en", "英文", "英语", "jp", "jpn", "ja", "日文", "日语",
+        "双语", "中英", "简繁", "chs&eng"
+      ],
+      "unknownLanguageAction": "keep",
+      "_comment_unknownLanguageAction": "没有语言标记的字幕无法确证是简体 → 一律保留，不删。",
+      "multiSimplifiedSuffix": ".{n}",
+      "_comment_multiSimplifiedSuffix": "同一集有多个简体版本时：第 1 个用基名，第 2 个起在扩展名前追加序号（.2 / .3 …）。这是「不得自动加 (1)/(2)」的唯一例外。",
+      "deleteVia": "clouddrive2-trash",
+      "_comment_deleteVia": "删除一律用普通删除（进云端回收站，可恢复），且只允许经 delete_list.py 执行（只删字幕或空目录、先列清单、默认 dry-run）。"
+    },
+
+    "fieldSeparator": ".",
+    "keepSpacesInsideTitle": true,
+    "englishTitleCase": "title-case",
+    "forbiddenChars": ["\\", "/", ":", "*", "?", "\"", "<", ">", "|"],
+    "forbiddenCharStrategy": "use-safe-official-alias-then-NEED_REVIEW",
+
+    "techInfo": {
+      "writeInBrackets": false,
+      "writeInEpisodeFileName": false,
+      "writeInMovieFileName": "resolution-only",
+      "_comment_writeInEpisodeFileName": "剧集 / 动漫文件名里不写任何技术信息 —— 集标题之后不得再出现任何字段。",
+      "_comment_writeInMovieFileName": "电影文件名只保留分辨率（不写来源 / 编码 / 位深 / 音频 / 声道）。",
+      "fieldOrder": ["source", "resolution", "dynamicRange", "codec", "bitDepth", "audio", "channels"],
+      "_comment_fieldOrder": "当前生效规则下剧集已完全不写技术信息、电影只写分辨率；此顺序保留供将来需要时恢复。",
+      "codecAliases": {
+        "H265": "H.265",
+        "X265": "H.265",
+        "H264": "H.264",
+        "X264": "H.264"
+      },
+      "preserveOriginalVariants": true,
+      "keepReleaseGroup": false,
+      "omitUnknownFields": true,
+      "_comment": "keepReleaseGroup=false 表示丢弃形如 -Group 的压制组标签；preserveOriginalVariants=true 表示各集原有的技术字段差异逐条保留、不擅自统一；omitUnknownFields=true 表示读不到 MediaInfo 的字段留空不补猜。"
+    },
+
+    "qualityTag": {
+      "default": "preserve-original",
+      "_comment_default": "preserve-original = 沿用原文件已有的分辨率 / 质量标签；仅在当次明确要求时才添加或删除。",
+      "addOnlyWhenRequested": true
+    },
+
+    "multiSeason": {
+      "decideByMainEntrySeasons": true,
+      "ignoreOrphanDuplicateEntries": true,
+      "verifySeasonExistsInTargetEntry": true,
+
+      "titleRule": "season-official-title",
+      "_comment_titleRule": "剧名用该季的正式季名，不是母剧名。若该季没有独立季名则退回母剧名。季名在主数据源上只写后半段时，要补上系列前缀成正式片名。",
+      "yearRule": "season-first-air-year",
+      "_comment_yearRule": "年份用该季自己的首播年，不是母剧首播年。",
+      "seasonNumberRule": "franchise-position",
+      "_comment_seasonNumberRule": "季号用该季在系列中的序号，不重置。",
+      "template": "季名.本季首播年.S系列季号E集号.「集标题」.扩展名",
+      "subtitleEpisodeRemap": "shifting-offset",
+      "_comment_subtitleEpisodeRemap": "字幕发布组按实际播出季编号时，必须整体顺延到数据源的季集编号，并抽样读正文核对。"
+    },
+
+    "safety": {
+      "dryRunRequired": true,
+      "keepDryRunInReply": true,
+      "_comment_keepDryRunInReply": "Dry Run 在对话里内联呈现摘要，不往工作区写 .txt 文档。",
+      "writeDryRunFile": false,
+      "onConflict": "fail",
+      "neverOverwrite": true,
+      "neverDelete": true,
+      "neverTranscode": true,
+      "markNeedReview": true,
+      "batchSize": 21
+    },
+
+    "folderStructure": {
+      "renameFolders": true,
+      "_comment_renameFolders": "允许重命名目录。生效范围仅两类：① 季文件夹（统一「第X季」）；② 作品主文件夹（统一为影视名）。番外 / 特别篇等目录一律不动。",
+      "createSeasonFolders": false,
+      "_comment_createSeasonFolders": "永远为 false：不主动新建季层级；单季作品的集文件直接放在作品目录下。",
+      "singleSeasonNoSeasonFolder": true,
+      "_comment_singleSeasonNoSeasonFolder": "单季作品不存在季文件夹 —— 点开作品目录即见各集。若历史遗留了「第1季」目录且作品确为单季，应把集文件上移到作品目录并清掉该空目录（需用户确认）。",
+      "moveFiles": false,
+      "_comment_moveFiles": "默认不移动文件。唯一例外：单季作品拆除多余「第1季」目录时需上移文件。",
+
+      "workFolder": {
+        "_comment": "作品主文件夹（分类目录下的一级目录）统一改名为该文件夹下影视的名字。",
+        "enabled": true,
+        "pattern": "work-title",
+        "includeYear": false,
+        "_comment_includeYear": "作品主文件夹名一律不带年份；年份只保留在电影文件名里。",
+        "multiSeasonWorks": "series-title",
+        "_comment_multiSeasonWorks": "多季合集的主文件夹用系列母剧名，不用某一季的季名。",
+        "singleSeasonWorks": "work-title",
+        "stripExtraInfo": true,
+        "_comment_stripExtraInfo": "去掉主文件夹名里的分辨率、集数标注、发布组、英文名、来源标签等。",
+        "skipPatterns": [
+          "番外", "特别篇", "特别集", "花絮", "幕后",
+          "SP", "Special", "Specials", "OVA", "OAD"
+        ],
+        "skipCategoryLevel": true,
+        "_comment_skipCategoryLevel": "分类层目录（如 剧集/美剧/电影）与更上层的根目录绝不动。",
+        "moveFiles": false,
+        "confirmBeforeApply": true,
+        "_comment_confirmBeforeApply": "执行前列出「当前名 → 目标名」清单交用户确认；作品身份无法可靠确认时标 NEED_REVIEW 不动。",
+        "applyTo": ["/media/tv"]
+      },
+
+      "seasonFolder": {
+        "_comment": "季文件夹统一命名规则：每一季的目录名统一为「第X季」。",
+        "enabled": true,
+        "pattern": "第{n}季",
+        "_comment_pattern": "{n} = 阿拉伯数字季号，如 第1季 / 第2季 / 第12季",
+        "stripExtraInfo": true,
+        "normalizeExamples": {
+          "Season01": "第1季",
+          "S01": "第1季",
+          "Season 1": "第1季",
+          "Season.01": "第1季",
+          "第1季（2009）4K": "第1季"
+        },
+        "skipPatterns": [
+          "番外", "特别篇", "特别集", "花絮", "幕后",
+          "SP", "Special", "Specials", "OVA", "OAD"
+        ],
+        "singleSeasonWorks": false,
+        "_comment_singleSeasonWorks": "false = 单季作品不强行加一层「第1季」目录，保持原目录结构。",
+        "moveFiles": false,
+        "confirmBeforeApply": true,
+        "applyTo": ["/media/tv"]
+      }
+    }
+  },
+
+  "scoping": {
+    "perDirectoryOverrides": false,
+    "_comment": "不做任何「按目录覆盖规则」的功能。所有作品、所有目录一律按 defaults 同一套规则命名 —— 规则只看作品本身与它的可信译名，不看存放目录。"
+  },
+
+  "clouddrive2": {
+    "_comment": "媒体库经 CloudDrive2 挂载为盘符时，文件操作（list / stat / mkdir / rename / move）走 CD2 的 gRPC API，不在挂载盘上执行。命名规则与 defaults 完全一致，本段只描述 I/O 通道。",
+    "enabled": true,
+    "protocol": "grpc",
+    "host": "127.0.0.1",
+    "ports": [19798, 29798],
+    "portAutoDetect": "config.toml[webconfig].http_port → 回退 19798/29798",
+    "proto": "src/storage/cd2/clouddrive.proto",
+    "authHeader": "authorization: Bearer <token>（gRPC metadata）",
+    "tokenSource": [
+      "env:CD2_API_TOKEN",
+      "file:token.txt（脚本同目录）",
+      "file:~/.config/media-nomenclator/cd2_token"
+    ],
+    "_comment_token": "⚠️ 令牌绝不可写进本配置文件，不可打印到日志或聊天内容。",
+    "apiPathRoot": "令牌的 root_dir；API 路径必须相对该前缀，照搬云端全路径会 NOT_FOUND",
+    "mountDriveHint": "F:",
+    "httpProxyWorkaround": "grpc.insecure_channel(..., options=[('grpc.enable_http_proxy', 0)])",
+    "allowedOps": ["list", "stat", "mkdir", "rename", "move", "verify"],
+    "forbiddenOps": [
+      "delete", "deletePermanently", "upload", "download",
+      "writeContent", "transcode", "nfo", "poster", "fanart"
+    ],
+    "moveConflictPolicy": "skip",
+    "_comment_moveConflictPolicy": "MoveFileRequest.conflictPolicy 固定 Skip；绝不使用 Overwrite。RenameFile 执行前先 stat 目标，存在即 SKIPPED_CONFLICT。",
+    "forceRefreshOnVerify": true,
+    "_comment_forceRefreshOnVerify": "CD2 有目录缓存，改后校验必须 forceRefresh = true。",
+    "pathGuard": "计划中任何带盘符 / 反斜杠 / UNC 的路径直接中止执行"
+  },
+
+  "tmdbApi": {
+    "_comment": "TMDB 只读取数通道：作品身份 / 季结构 / 分集标题 / 地区别名。只读，不参与重命名执行。",
+    "enabled": true,
+    "apiVersion": "v3",
+    "host": "api.themoviedb.org",
+    "basePath": "/3",
+    "script": "src/sources/tmdb/tmdb_api.py",
+    "keySource": [
+      "env:TMDB_API_KEY",
+      "file:~/.config/media-nomenclator/tmdb_api_key",
+      "file:~/.config/media-nomenclator/tmdb_token"
+    ],
+    "_comment_key": "⚠️ 密钥绝不可写进本配置文件，不可打印到日志或聊天内容（脚本只回显掩码）。",
+    "dnsPolutionWorkaround": "系统 DNS 把 api.themoviedb.org 解析成错误 IP 时直连必超时 → 先用 DoH 取真实 IP，再用「固定 IP + 正确 SNI」建 TLS（证书照常校验，不关 verify）",
+    "dnsCache": "~/.cache/media-nomenclator/tmdb_dns.json（TTL 3600s）",
+    "defaultLanguage": "zh-CN",
+    "allowedOps": ["search", "tv", "season", "movie", "titles", "raw", "selftest"],
+    "forbiddenOps": [
+      "任何写操作", "上传", "下载", "图片 / NFO / poster 生成",
+      "修改本项目目录外任何文件"
+    ],
+    "sourceWeightNote": "TMDB 只算「一源」：zh-CN / zh-TW / zh-HK 同属 TMDB，不能互相印证；中文译名仍须按 zhTitleAcceptance 多方查证。",
+    "episodePlaceholderDetection": [
+      "^第\\d+[集话回]$",
+      "^第[一二三四五六七八九十百零两]+[集话回]$",
+      "^Episode\\s*0*\\d+$",
+      "^EP\\.?\\s*0*\\d+$"
+    ],
+    "_comment_placeholder": "命中即视为占位编号假标题，不采信；纯数字（如 737 / 51）是真实集标题，刻意不列入。",
+    "fallback": "API 不可达时，退化为网页抓取兜底，并在 Dry Run 里注明降级原因"
+  },
+
+  "dandanplay": {
+    "_comment": "【规划中】动漫识别与剧集匹配的数据源之一。当前尚未申请到 API 权限，本段仅为预约条款，未启用。",
+    "enabled": false,
+    "status": "planned",
+    "scope": "anime",
+    "usage": "辅助确定动漫作品及具体剧集信息（作品识别 / 剧集匹配）",
+    "plannedChannel": "src/sources/dandanplay/dandanplay_api.py（待建）",
+    "credentialPolicy": "AppId / AppSecret 独立存放于用户配置目录，不入仓库、不入配置、日志只回显掩码",
+    "onActivation": [
+      "动漫类别的主来源由 tmdb 切换为 dandanplay，tmdb / 豆瓣 / 维基降为补充",
+      "中文剧名的第二源门槛不变",
+      "季集结构与现有库不一致时，按刮削兼容性判断取舍；集标题差异先出 Dry Run 交用户拍板，不自动改"
+    ]
+  }
+}

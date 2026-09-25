@@ -1,0 +1,52 @@
+{
+  "_comment": "重命名计划示例。计划只支持三种动作：mkdir / rename / move。所有路径必须是存储后端可识别的绝对路径（此处以 CloudDrive2 云端路径为例，即以 / 开头、相对令牌 root_dir）。执行器 apply_plan.py 默认只打印（dry-run），加 --apply --yes 才会落盘。",
+  "_safety": "任何带盘符（如 F:\\）、反斜杠或 UNC 的路径都会被执行器直接中止 —— 从源头保证不误操作挂载盘。",
+
+  "name": "Example Show",
+  "api_root": "/media/anime/Example-Show",
+  "note": "对应挂载盘 F:\\media\\anime\\Example-Show（仅注释用，执行不走 F:）",
+
+  "operations": [
+    {
+      "op": "mkdir",
+      "parent": "/media/anime/Example-Show",
+      "name": "第2季"
+    },
+    {
+      "op": "rename",
+      "path": "/media/anime/Example-Show/第1季/Example.Show.S01E01.1080p.WEB-DL.H.264.AAC.mkv",
+      "new_name": "Example Show.2020.S01E01.「The First Episode」.mkv"
+    },
+    {
+      "op": "rename",
+      "path": "/media/anime/Example-Show/第1季/Example.Show.S01E01.1080p.WEB-DL.H.264.AAC.chs.ass",
+      "new_name": "Example Show.2020.S01E01.「The First Episode」.ass"
+    },
+    {
+      "op": "rename",
+      "path": "/media/anime/Example-Show/Season02",
+      "new_name": "第2季"
+    },
+    {
+      "op": "move",
+      "paths": [
+        "/media/anime/Example-Show/第2季/Example.Show.S02E01.mkv"
+      ],
+      "dest": "/media/anime/Example-Show/第2季"
+    }
+  ],
+
+  "verify": {
+    "_comment": "执行后重新列目录（forceRefresh）校验。must_exist / must_not_exist 既可写「目录内的名字」，也可写绝对路径。",
+    "must_exist": [
+      "Example Show.2020.S01E01.「The First Episode」.mkv",
+      "Example Show.2020.S01E01.「The First Episode」.ass",
+      "第2季"
+    ],
+    "must_not_exist": [
+      "Example.Show.S01E01.1080p.WEB-DL.H.264.AAC.mkv",
+      "Season02"
+    ],
+    "expect_file_count": 24
+  }
+}
