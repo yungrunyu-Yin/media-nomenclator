@@ -1,6 +1,6 @@
 # MediaNomenclator
 
-项目名 MediaNomenclator（媒体「命名官」），仓库名 `media-nomenclator`，MIT 许可。
+项目名 MediaNomenclator，仓库名 `media-nomenclator`，MIT 许可。
 
 这是个整理媒体库文件名的工具集：认出作品、取回元数据、把文件名规范化、重命名视频，顺带把外挂字幕改成同名配对。能力以 Skill 的形式组织（AI 助手可以直接加载执行），另有一批能独立跑的 Python 脚本。
 
